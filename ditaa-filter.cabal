@@ -1,0 +1,29 @@
+name:                ditaa-filter
+version:             0.1.0.0
+synopsis:            Ditaa Pandoc filter
+description:         Please see README.md
+homepage:            https://github.com/githubuser/my-filter#readme
+license:             BSD3
+license-file:        LICENSE
+author:              takenoko
+maintainer:          ttaakkee@gmail.com
+copyright:           2018 takenoko
+category:            Text
+build-type:          Simple
+cabal-version:       >=1.10
+extra-source-files:  README.md
+
+executable ditaa-filter
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5,
+                       pandoc-types >= 1.17 && < 1.18,
+                       pandoc >= 1.19.2 && < 2.1,
+                       process,
+                       temporary,
+                       filepath,
+                       reflection,
+                       directory
+
+
