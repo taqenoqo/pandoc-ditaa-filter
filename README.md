@@ -1,8 +1,12 @@
 # Ditaa Pandoc Filter
 
-This can convert Ditaa code blocks in markdown to diagrams.
+This is a Pandoc filter to convert Ditaa code blocks to diagrams.
 
 ## Usage
+
+```
+$ pandoc input.md -t json --filter ditaa-filter -o output.md
+```
 
 * input.md
 
@@ -16,11 +20,7 @@ This can convert Ditaa code blocks in markdown to diagrams.
     ```
     ````
 
-```
-$ pandoc input.md -t json --filter ditaa-filter -o output.md
-```
-
-or
+To check the filter, do as follows.
 
 ```
 $ pandoc input.md -t json | stack exec ditaa-filter | pandoc -f json -o output.md
