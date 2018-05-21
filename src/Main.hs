@@ -21,19 +21,22 @@ data Config = Config
   { optDitaaCmd :: String
   , optImgDir :: Maybe FilePath
   , optAppID :: String
+  , optImgDirRel :: Maybe FilePath
   } deriving Show
 
 defaultConfig :: Config
 defaultConfig = Config
   { optDitaaCmd = "ditaa"
   , optImgDir = Nothing
-  , optAppID = "ditaa-md"
+  , optAppID = "ditaa-filter"
+  , optImgDirRel = Nothing
   }
 
 options :: [OptDescr (Config -> Config)]
 options =
   [ Option [] ["ditta-cmd"] (ReqArg (\s cfg -> cfg { optDitaaCmd = s }) "CMD") "ditaa command"
-  , Option [] ["img-dir"] (ReqArg (\s cfg -> cfg { optImgDir = Just s }) "DIR") "image directory"
+  , Option [] ["img-dir"] (ReqArg (\s cfg -> cfg { optImgDir = Just s }) "DIR") "image output directory"
+  , Option [] ["img-dir-relative"] (ReqArg (\s cfg -> cfg { optImgDirRel = Just s }) "DIR") "relative path of image output directory"
   ]
 
 getOptions :: IO (Config, [String])
@@ -57,10 +60,12 @@ createTmpDir = case optImgDir given of
     createTempDirectory sysTmpDir $ optAppID given
   Just imgDir -> do
     pwd <- getCurrentDirectory
-    createTempDirectory pwd imgDir
+    let imgDirPath = pwd </> imgDir
+    createDirectoryIfMissing False imgDirPath
+    return $ imgDirPath
 
 withGivenConfig :: Config -> (Given Config => a) -> a
-withGivenConfig cfg f = give cfg $ f
+withGivenConfig cfg f = give cfg f
 
 convertPandoc :: Given Config => FilePath -> Pandoc -> IO Pandoc
 convertPandoc tmpDir (Pandoc meta blocks) = do
@@ -70,15 +75,18 @@ convertPandoc tmpDir (Pandoc meta blocks) = do
     numberedBlocks = numberDitaaBlocks blocks 1
 
 ditaaBlockToImg :: Given Config => FilePath -> (Block, Int) -> IO Block
-ditaaBlockToImg tmpDir (DitaaBlock code, i) = do
+ditaaBlockToImg imgDir (DitaaBlock code, i) = do
   writeFile txtPath code
   readProcess ditaaCmd [txtPath, imgPath] ""
-  return $ Para [Image nullAttr [Str imgTitle] (imgPath, "fig:" ++ imgTitle)]
+  return $ Para [Image nullAttr [Str imgTitle] (imgLink, "fig:" ++ imgTitle)]
   where
     imgTitle = optAppID given ++ show i
     ditaaCmd = optDitaaCmd given
-    txtPath = tmpDir </> show i <.> "txt"
-    imgPath = tmpDir </> show i <.> "png"
+    txtPath = imgDir </> show i <.> "txt"
+    imgPath = imgDir </> show i <.> "png"
+    imgLink = case optImgDirRel given of
+      Nothing -> imgPath
+      Just imgRelDir -> imgRelDir </> show i <.> "png"
 ditaaBlockToImg _ (b, _) = return b
 
 numberDitaaBlocks :: [Block] -> Int -> [(Block, Int)]
