@@ -81,7 +81,9 @@ ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
   where
     imgTitle = cfgAppID given ++ show i
     ditaaCmd = cfgDitaaCmd given
-    basename = title ++ "-" ++ show i
+    basename = case title of
+      "" -> show i
+      t -> t ++ "-" ++ show i
     txtPath = imgDir </> basename <.> "txt"
     imgPath = imgDir </> basename <.> "png"
     imgLink = case cfgImgDirRel given of
