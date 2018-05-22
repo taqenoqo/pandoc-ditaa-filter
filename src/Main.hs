@@ -65,25 +65,29 @@ createImgDir = case cfgImgDir given of
 
 convertPandoc :: Given Config => FilePath -> Pandoc -> IO Pandoc
 convertPandoc imgDir (Pandoc meta blocks) = do
-  newBlocks <- mapM (ditaaBlockToImg imgDir) numberedBlocks
+  newBlocks <- mapM (ditaaBlockToImg imgDir title) numberedBlocks
   return $ Pandoc meta newBlocks
   where
     numberedBlocks = numberDitaaBlocks blocks 1
+    title = case docTitle meta of
+      [Str t] -> t
+      _ -> ""
 
-ditaaBlockToImg :: Given Config => FilePath -> (Block, Int) -> IO Block
-ditaaBlockToImg imgDir (DitaaBlock code, i) = do
+ditaaBlockToImg :: Given Config => FilePath -> String -> (Block, Int) -> IO Block
+ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
   writeFile txtPath code
   readProcess ditaaCmd [txtPath, imgPath] ""
   return $ Para [Image nullAttr [Str imgTitle] (imgLink, "fig:" ++ imgTitle)]
   where
     imgTitle = cfgAppID given ++ show i
     ditaaCmd = cfgDitaaCmd given
-    txtPath = imgDir </> show i <.> "txt"
-    imgPath = imgDir </> show i <.> "png"
+    basename = title ++ "-" ++ show i
+    txtPath = imgDir </> basename <.> "txt"
+    imgPath = imgDir </> basename <.> "png"
     imgLink = case cfgImgDirRel given of
       Nothing -> imgPath
       Just imgRelDir -> imgRelDir </> show i <.> "png"
-ditaaBlockToImg _ (b, _) = return b
+ditaaBlockToImg _ _ (b, _) = return b
 
 numberDitaaBlocks :: [Block] -> Int -> [(Block, Int)]
 numberDitaaBlocks [] !_ = []
