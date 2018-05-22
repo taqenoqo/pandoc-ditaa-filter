@@ -2,6 +2,10 @@
 
 This is a Pandoc filter to convert Ditaa code blocks to diagrams.
 
+## Install
+
+The recommended way is using `stack install`.
+
 ## Usage
 
 ```
@@ -19,6 +23,8 @@ $ pandoc input.md -t json --filter ditaa-filter -o output.md
     +------+      +------+
     ```
     ````
+
+## Contribution
 
 To check the filter, do as follows.
 
