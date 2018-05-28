@@ -17,23 +17,26 @@ import Data.Reflection (Given, give, given)
 pattern DitaaBlock code <- CodeBlock (_, ["ditaa"], _) code
 
 data Config = Config
-  { cfgDitaaCmd :: String
-  , cfgImgDir :: Maybe FilePath
-  , cfgAppID :: String
-  , cfgImgDirRel :: Maybe FilePath
+  { cfgDitaaCmd    :: String
+  , cfgDitaaOpt :: String
+  , cfgImgDir      :: Maybe FilePath
+  , cfgAppID       :: String
+  , cfgImgDirRel   :: Maybe FilePath
   } deriving Show
 
 defaultConfig :: Config
 defaultConfig = Config
-  { cfgDitaaCmd = "ditaa"
-  , cfgImgDir = Nothing
-  , cfgAppID = "ditaa-filter"
-  , cfgImgDirRel = Nothing
+  { cfgDitaaCmd    = "ditaa"
+  , cfgDitaaOpt = ""
+  , cfgImgDir      = Nothing
+  , cfgAppID       = "ditaa-filter"
+  , cfgImgDirRel   = Nothing
   }
 
 options :: [OptDescr (Config -> Config)]
 options =
   [ Option [] ["ditta-cmd"] (ReqArg (\s cfg -> cfg { cfgDitaaCmd = s }) "CMD") "ditaa command"
+  , Option [] ["ditta-opt"] (ReqArg (\s cfg -> cfg { cfgDitaaOpt = s }) "OPT") "ditaa option"
   , Option [] ["img-dir"] (ReqArg (\s cfg -> cfg { cfgImgDir = Just s }) "DIR") "image output directory"
   , Option [] ["img-dir-relative"] (ReqArg (\s cfg -> cfg { cfgImgDirRel = Just s }) "DIR") "relative path of image output directory"
   ]
@@ -76,11 +79,12 @@ convertPandoc imgDir (Pandoc meta blocks) = do
 ditaaBlockToImg :: Given Config => FilePath -> String -> (Block, Int) -> IO Block
 ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
   writeFile txtPath code
-  readProcess ditaaCmd [txtPath, imgPath] ""
+  readProcess ditaaCmd [ditaaOpt, txtPath, imgPath] ""
   return $ Para [Image nullAttr [Str imgTitle] (imgLink, "fig:" ++ imgTitle)]
   where
     imgTitle = cfgAppID given ++ show i
     ditaaCmd = cfgDitaaCmd given
+    ditaaOpt = cfgDitaaOpt given
     basename = case title of
       "" -> show i
       t -> t ++ "-" ++ show i
