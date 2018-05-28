@@ -88,7 +88,7 @@ ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
     imgPath = imgDir </> basename <.> "png"
     imgLink = case cfgImgDirRel given of
       Nothing -> imgPath
-      Just imgRelDir -> imgRelDir </> show i <.> "png"
+      Just imgRelDir -> imgRelDir </> basename <.> "png"
 ditaaBlockToImg _ _ (b, _) = return b
 
 numberDitaaBlocks :: [Block] -> Int -> [(Block, Int)]
