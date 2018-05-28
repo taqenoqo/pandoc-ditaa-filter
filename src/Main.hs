@@ -18,7 +18,7 @@ pattern DitaaBlock code <- CodeBlock (_, ["ditaa"], _) code
 
 data Config = Config
   { cfgDitaaCmd    :: String
-  , cfgDitaaOpt :: String
+  , cfgDitaaOpt    :: String
   , cfgImgDir      :: Maybe FilePath
   , cfgAppID       :: String
   , cfgImgDirRel   :: Maybe FilePath
@@ -27,7 +27,7 @@ data Config = Config
 defaultConfig :: Config
 defaultConfig = Config
   { cfgDitaaCmd    = "ditaa"
-  , cfgDitaaOpt = ""
+  , cfgDitaaOpt    = ""
   , cfgImgDir      = Nothing
   , cfgAppID       = "ditaa-filter"
   , cfgImgDirRel   = Nothing
