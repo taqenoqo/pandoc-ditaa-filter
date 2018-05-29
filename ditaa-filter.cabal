@@ -24,6 +24,7 @@ executable ditaa-filter
                        temporary,
                        filepath,
                        reflection,
-                       directory
+                       directory,
+                       parsec
 
 

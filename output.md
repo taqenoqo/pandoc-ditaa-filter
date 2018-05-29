@@ -20,6 +20,4 @@
 です
 ```
 
-![ditaa-filter1](/private/var/folders/qj/4djpmzz976b00n3m358bn8bm0000gn/T/ditaa-filter15757/1.png "ditaa-filter1")
-
-![alt text](hoge.img "title")
+![ditaa-filter1](/private/var/folders/qj/4djpmzz976b00n3m358bn8bm0000gn/T/ditaa-filter41619/1.png "ditaa-filter1")
