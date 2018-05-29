@@ -105,7 +105,7 @@ ditaaBlockToImg :: Given Config => FilePath -> String -> (Block, Int) -> IO Bloc
 ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
   writeFile txtPath code
   readProcess ditaaCmd ditaaArgs ""
-  return $ Para [Image nullAttr [Str imgTitle] (imgLink, "fig:" ++ imgTitle)]
+  return $ Para [Image nullAttr [] (imgLink, "fig:" ++ imgTitle)]
   where
     imgTitle = cfgAppID given ++ show i
     ditaaCmd = cfgDitaaCmd given
