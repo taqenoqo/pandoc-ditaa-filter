@@ -130,5 +130,8 @@ splitDitaaOptions s = parse ditaaOpts "ditaa options" s where
   spaces1 = skipMany1 space
   escape = try escapedSlosh <|> try escapedSpace
   escapedSlosh = string "\\\\" >> return "\\"
-  escapedSpace = string "\\ " >> return " "
+  escapedSpace = do
+    string "\\"
+    sp <- space
+    return [sp]
 
