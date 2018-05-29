@@ -1,6 +1,6 @@
-# Ditaa Pandoc Filter
+# Pandoc Ditaa Filter
 
-This is a Pandoc filter to convert Ditaa code blocks to diagrams.
+A Pandoc filter to convert Ditaa code blocks to images.
 
 ## Install
 
@@ -9,7 +9,7 @@ The recommended way is using `stack install`.
 ## Usage
 
 ```
-$ pandoc input.md -t json --filter ditaa-filter -o output.md
+$ pandoc input.md --filter ditaa-filter -o output.md
 ```
 
 * input.md
@@ -19,7 +19,7 @@ $ pandoc input.md -t json --filter ditaa-filter -o output.md
 
     ``` ditaa
     +------+      +------+
-    | hoge +----->+ fuga |
+    | hoge |----->| fuga |
     +------+      +------+
     ```
     ````
