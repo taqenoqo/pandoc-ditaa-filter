@@ -23,6 +23,7 @@ data Config = Config {
   cfgDitaaOpts  :: String,
   cfgDitaaOptsP :: [String],
   cfgImgDir     :: Maybe FilePath,
+  cfgImgExt     :: String,
   cfgAppID      :: String,
   cfgImgDirRel  :: Maybe FilePath
   } deriving Show
@@ -33,6 +34,7 @@ defaultConfig = Config {
   cfgDitaaOpts  = "",
   cfgDitaaOptsP = [],
   cfgImgDir     = Nothing,
+  cfgImgExt     = "png",
   cfgAppID      = "ditaa-filter",
   cfgImgDirRel  = Nothing
   }
@@ -48,6 +50,9 @@ options = [
   Option [] ["img-dir"]
     (ReqArg (\s cfg -> cfg { cfgImgDir = Just s }) "DIR")
     "image output directory",
+  Option [] ["img-ext"]
+    (ReqArg (\s cfg -> cfg { cfgImgExt = s }) "EXT")
+    "image extension",
   Option [] ["img-dir-relative"]
     (ReqArg (\s cfg -> cfg { cfgImgDirRel = Just s }) "DIR")
     "relative path of image output directory"
@@ -108,16 +113,17 @@ ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
   return $ Para [Image nullAttr [] (imgLink, "fig:" ++ imgTitle)]
   where
     imgTitle = cfgAppID given ++ show i
+    imgExt = cfgImgExt given
     ditaaCmd = cfgDitaaCmd given
     ditaaArgs = cfgDitaaOptsP given ++ [txtPath, imgPath]
     basename = case title of
       "" -> show i
       t -> t ++ "-" ++ show i
-    txtPath = imgDir </> basename <.> "txt"
-    imgPath = imgDir </> basename <.> "png"
+    txtPath = imgDir </> basename <.> "ditaa"
+    imgPath = imgDir </> basename <.> imgExt
     imgLink = case cfgImgDirRel given of
       Nothing -> imgPath
-      Just imgRelDir -> imgRelDir </> basename <.> "png"
+      Just imgRelDir -> imgRelDir </> basename <.> imgExt
 ditaaBlockToImg _ _ (b, _) = return b
 
 splitDitaaOptions :: String -> Either ParseError [String]
