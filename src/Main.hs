@@ -15,6 +15,7 @@ import Data.Maybe (fromMaybe)
 import Data.Reflection (Given, give, given)
 import Text.Parsec
 import Control.Monad (void)
+import Control.Concurrent.Async (mapConcurrently)
 
 pattern DitaaBlock code <- CodeBlock (_, ["ditaa"], _) code
 
@@ -95,16 +96,19 @@ createImgDir = case cfgImgDir given of
 
 convertPandoc :: Given Config => FilePath -> Pandoc -> IO Pandoc
 convertPandoc imgDir (Pandoc meta blocks) = do
-  newBlocks <- mapM (ditaaBlockToImg imgDir title) $ numberDitaaBlocks blocks 1
+  newBlocks <- mapConcurrently (ditaaBlockToImg imgDir title) $ numberedDitaaBlocks
   return $ Pandoc meta newBlocks
   where
     title = case docTitle meta of
       [Str t] -> t
       _ -> ""
-    numberDitaaBlocks [] !_ = []
-    numberDitaaBlocks (b@(DitaaBlock _) : bs) !i =
-      (b, i) : numberDitaaBlocks bs (i + 1)
-    numberDitaaBlocks (b:bs) !i = (b, i) : numberDitaaBlocks bs i
+    numberedDitaaBlocks = numberDitaaBlocks blocks 1
+
+numberDitaaBlocks :: [Block] -> Int -> [(Block, Int)]
+numberDitaaBlocks [] !_ = []
+numberDitaaBlocks (b@(DitaaBlock _) : bs) !i =
+  (b, i) : numberDitaaBlocks bs (i + 1)
+numberDitaaBlocks (b:bs) !i = (b, i) : numberDitaaBlocks bs i
 
 ditaaBlockToImg :: Given Config => FilePath -> String -> (Block, Int) -> IO Block
 ditaaBlockToImg imgDir title (DitaaBlock code, i) = do

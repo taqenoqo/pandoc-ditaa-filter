@@ -25,6 +25,7 @@ executable pandoc-ditaa-filter
                        filepath,
                        reflection,
                        directory,
-                       parsec
+                       parsec,
+                       async
 
 
