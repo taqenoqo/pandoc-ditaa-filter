@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Main where
@@ -13,11 +14,12 @@ import System.Environment (getArgs)
 import System.Directory
 import Data.Maybe (fromMaybe)
 import Data.Reflection (Given, give, given)
+import Data.Text (pack, unpack)
 import Text.Parsec
 import Control.Monad (void)
 import Control.Concurrent.Async (mapConcurrently)
 
-pattern DitaaBlock code <- CodeBlock (_, ["ditaa"], _) code
+pattern DitaaBlock code <- CodeBlock (_, [(unpack -> "ditaa")], _) code
 
 data Config = Config {
   cfgDitaaCmd   :: String,
@@ -100,7 +102,7 @@ convertPandoc imgDir (Pandoc meta blocks) = do
   return $ Pandoc meta newBlocks
   where
     title = case docTitle meta of
-      [Str t] -> t
+      [Str t] -> unpack t
       _ -> ""
     numberedDitaaBlocks = numberDitaaBlocks blocks 1
 
@@ -112,9 +114,9 @@ numberDitaaBlocks (b:bs) !i = (b, i) : numberDitaaBlocks bs i
 
 ditaaBlockToImg :: Given Config => FilePath -> String -> (Block, Int) -> IO Block
 ditaaBlockToImg imgDir title (DitaaBlock code, i) = do
-  writeFile txtPath code
+  writeFile txtPath $ unpack code
   readProcess ditaaCmd ditaaArgs ""
-  return $ Para [Image nullAttr [] (imgLink, "fig:" ++ imgTitle)]
+  return $ Para [Image nullAttr [] (pack imgLink, pack $ "fig:" ++ imgTitle)]
   where
     imgTitle = cfgAppID given ++ show i
     imgExt = cfgImgExt given
